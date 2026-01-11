@@ -24,8 +24,9 @@ export function MediaPlayer({ query }: MediaPlayerProps) {
         height="100%"
         src={src}
         frameBorder="0"
-        allow="autoplay; encrypted-media"
+        allow="autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
+        referrerPolicy="no-referrer"
         title="JARVIS Music Player"
       />
     </div>
