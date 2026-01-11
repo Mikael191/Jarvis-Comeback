@@ -12,11 +12,23 @@ export function useSpeechSynthesis() {
         setVoices(availableVoices);
 
         // Try to find a good Portuguese voice
-        // Prioritize "Google Português do Brasil" or "Luciana" or "Daniel"
-        const ptVoice = availableVoices.find(v => v.lang === 'pt-BR' && (v.name.includes('Google') || v.name.includes('Natural')));
-        const fallbackPt = availableVoices.find(v => v.lang === 'pt-BR');
+        // Prioritize male voices or natural sounding ones
+        // "Daniel" is a common male PT-BR voice on Microsoft Edge/Windows
+        // "Google Português" is usually female, but high quality.
+        // "Luciana" is female. "Felipe" is male.
+        const ptVoices = availableVoices.filter(v => v.lang === 'pt-BR' || v.lang === 'pt-PT');
 
-        setSelectedVoice(ptVoice || fallbackPt || null);
+        const maleVoice = ptVoices.find(v =>
+          v.name.includes('Daniel') ||
+          v.name.includes('Felipe') ||
+          v.name.toLowerCase().includes('male') ||
+          v.name.toLowerCase().includes('homem')
+        );
+
+        const googleVoice = ptVoices.find(v => v.name.includes('Google'));
+
+        // Prefer male voice -> then Google (quality) -> then any PT
+        setSelectedVoice(maleVoice || googleVoice || ptVoices[0] || null);
       };
 
       loadVoices();
@@ -30,7 +42,16 @@ export function useSpeechSynthesis() {
     // Cancel current speech
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    // Clean Markdown for speech (remove **, #, etc)
+    const cleanText = text
+      .replace(/\*\*/g, '')      // Remove bold markers
+      .replace(/\*/g, '')        // Remove italics markers
+      .replace(/#{1,6}\s/g, '')  // Remove headers
+      .replace(/`/g, '')         // Remove code markers
+      .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links, keep text
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     if (selectedVoice) {
       utterance.voice = selectedVoice;
     }
