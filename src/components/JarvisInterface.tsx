@@ -37,7 +37,7 @@ export function JarvisInterface({
         : "idle";
 
   return (
-    <div className="flex flex-col h-screen max-h-screen bg-black/90 text-zinc-100 font-sans selection:bg-cyan-500/30">
+    <div className="flex flex-col h-[100dvh] max-h-[100dvh] bg-black/90 text-zinc-100 font-sans selection:bg-cyan-500/30">
       {/* Header */}
       <header className="relative flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-black/50 backdrop-blur-sm z-10">
         <div className="flex items-center gap-2 z-20">

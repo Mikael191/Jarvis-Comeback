@@ -17,6 +17,12 @@ export default function Home() {
   const [isThinking, setIsThinking] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [musicQuery, setMusicQuery] = useState<string | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Mark as hydrated after mount to avoid hydration mismatch and premature settings prompt
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const handleSendMessage = useCallback(async (text: string) => {
     if (!text.trim()) return;
@@ -87,10 +93,11 @@ export default function Home() {
   }, [isListening, transcript, handleSendMessage, resetTranscript]);
 
   // Prompt for API key on first load if missing
+  // Only check after hydration to ensure local storage has loaded
   useEffect(() => {
-    if (!apiKey) {
+    if (isHydrated && !apiKey) {
       setShowSettings(true);
-      // Optional: Add a welcome message from local logic before AI is ready
+
       // Check if init message exists to avoid duplicates in strict mode
       const hasInit = messages.some(m => m.id === 'init');
       if (messages.length === 0 && !hasInit) {
@@ -102,7 +109,7 @@ export default function Home() {
         });
       }
     }
-  }, [apiKey, messages, addMessage]);
+  }, [isHydrated, apiKey, messages, addMessage]);
 
   const toggleVoice = () => {
     if (isListening) {
