@@ -39,15 +39,20 @@ export function JarvisInterface({
   return (
     <div className="flex flex-col h-screen max-h-screen bg-black/90 text-zinc-100 font-sans selection:bg-cyan-500/30">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-black/50 backdrop-blur-sm z-10">
-        <div className="flex items-center gap-2">
+      <header className="relative flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-black/50 backdrop-blur-sm z-10">
+        <div className="flex items-center gap-2 z-20">
           <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_10px_#06b6d4]" />
           <h1 className="font-mono tracking-widest text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-700">
             JARVIS
           </h1>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Center Visualizer */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-80 z-10">
+           <AudioVisualizer state={visualizerState} />
+        </div>
+
+        <div className="flex items-center gap-4 z-20">
             {currentTrack && (
                 <div className="hidden md:flex items-center gap-2 text-xs text-cyan-400/70 border border-cyan-900/30 px-3 py-1 rounded-full">
                     <Music size={12} />
@@ -66,11 +71,6 @@ export function JarvisInterface({
       {/* Main Chat */}
       <main className="flex-1 relative flex flex-col overflow-hidden bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-black to-black">
         <MessageList messages={messages} />
-
-        {/* Visualizer Floating (or fixed above input) */}
-        <div className="absolute bottom-4 left-0 right-0 pointer-events-none flex justify-center pb-24 opacity-80">
-          <AudioVisualizer state={visualizerState} />
-        </div>
       </main>
 
       {/* Input */}
