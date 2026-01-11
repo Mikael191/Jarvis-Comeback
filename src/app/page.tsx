@@ -6,7 +6,7 @@ import { useJarvisStore } from "@/lib/store";
 import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { SettingsModal } from "@/components/SettingsModal";
-import { MediaPlayer } from "@/components/MediaPlayer";
+import { MusicSelector } from "@/components/MusicSelector";
 
 export default function Home() {
   const { messages, apiKey, userName, voiceSpeed, addMessage } = useJarvisStore();
@@ -131,7 +131,10 @@ export default function Home() {
         currentTrack={musicQuery}
       />
 
-      <MediaPlayer query={musicQuery} />
+      <MusicSelector
+        query={musicQuery}
+        onClose={() => setMusicQuery(null)}
+      />
 
       <SettingsModal
         isOpen={showSettings}
