@@ -37,17 +37,17 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
           {/* API Key */}
           <div>
             <label className="block text-sm text-zinc-400 mb-1 flex items-center gap-2">
-              <Key size={14} /> Hugging Face Access Token
+              <Key size={14} /> Groq Cloud API Key
             </label>
             <input
               type="password"
               value={localKey}
               onChange={(e) => setLocalKey(e.target.value)}
-              placeholder="hf_..."
+              placeholder="gsk_..."
               className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-white focus:border-cyan-500 outline-none"
             />
             <p className="text-xs text-zinc-500 mt-1">
-              Necessário para a inteligência. Obtenha gratuitamente em huggingface.co/settings/tokens
+              Necessário para a inteligência. Obtenha gratuitamente em <a href="https://console.groq.com/keys" target="_blank" rel="noreferrer" className="text-cyan-400 hover:underline">console.groq.com</a>
             </p>
           </div>
 

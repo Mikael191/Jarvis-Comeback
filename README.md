@@ -11,9 +11,9 @@ JARVIS não é um servo ("Ligue a luz"), é um **Conselheiro**.
 - **Privacidade:** Histórico salvo apenas no seu navegador. A chave da API é sua e não fica salva no servidor.
 
 ## 🚀 Tecnologias
-- **Frontend:** Next.js 15 (App Router), React, Tailwind CSS, Framer Motion.
+- **Frontend:** Next.js 16 (App Router), React 19, Tailwind CSS, Framer Motion.
 - **Backend:** Next.js API Routes (Serverless).
-- **IA:** Hugging Face Inference API (Llama 3 ou Mistral).
+- **IA:** Groq Cloud API (Llama 3 8B - Ultra Rápido).
 - **Voz:** Web Speech API (Nativa do navegador - STT e TTS).
 - **Música:** YouTube Embed API (Modo Search).
 
@@ -38,12 +38,12 @@ JARVIS não é um servo ("Ligue a luz"), é um **Conselheiro**.
 4. **Acesse:** Abra `http://localhost:3000` no navegador.
 
 ## 🔑 Configuração (API Key)
-Para o JARVIS pensar, ele precisa de um cérebro. Usamos a API gratuita do Hugging Face.
+Para o JARVIS pensar rápido e de graça, usamos a **Groq Cloud**.
 
-1. Crie uma conta em [huggingface.co](https://huggingface.co/).
-2. Vá em **Settings > Access Tokens**.
-3. Crie um novo token com permissão `read` (Leitura).
-4. Ao abrir o projeto, clique no ícone de ⚙️ (Configurações) e cole sua chave.
+1. Crie uma conta em [console.groq.com](https://console.groq.com/).
+2. Vá em **API Keys**.
+3. Crie uma nova chave (Create API Key).
+4. Ao abrir o projeto, clique no ícone de ⚙️ (Configurações) e cole sua chave `gsk_...`.
 
 ## 🎵 Comandos de Música
 O JARVIS entende pedidos de música e toca vídeos do YouTube automaticamente.
