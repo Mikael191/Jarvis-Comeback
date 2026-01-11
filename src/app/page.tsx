@@ -91,7 +91,9 @@ export default function Home() {
     if (!apiKey) {
       setShowSettings(true);
       // Optional: Add a welcome message from local logic before AI is ready
-      if (messages.length === 0) {
+      // Check if init message exists to avoid duplicates in strict mode
+      const hasInit = messages.some(m => m.id === 'init');
+      if (messages.length === 0 && !hasInit) {
         addMessage({
           id: 'init',
           role: 'assistant',
@@ -100,7 +102,7 @@ export default function Home() {
         });
       }
     }
-  }, [apiKey, messages.length, addMessage]);
+  }, [apiKey, messages, addMessage]);
 
   const toggleVoice = () => {
     if (isListening) {
