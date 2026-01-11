@@ -5,13 +5,17 @@ interface MediaPlayerProps {
 export function MediaPlayer({ query }: MediaPlayerProps) {
   if (!query) return null;
 
-  // Encode query for URL
-  const encodedQuery = encodeURIComponent(query);
+  // Append "audio" to the query to find embeddable versions (avoids VEVO restrictions)
+  // And encode
+  const encodedQuery = encodeURIComponent(query + " audio");
+
+  // Get origin for CORS/Embed security
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
 
   // Using YouTube Embed with listType=search to play results for the query
   // This avoids needing a specific video ID or API Key.
   // URL format: https://www.youtube.com/embed?listType=search&list=QUERY
-  const src = `https://www.youtube.com/embed?listType=search&list=${encodedQuery}&autoplay=1`;
+  const src = `https://www.youtube.com/embed?listType=search&list=${encodedQuery}&autoplay=1&origin=${origin}`;
 
   return (
     <div className="fixed bottom-20 right-4 w-64 h-36 md:w-80 md:h-48 bg-black rounded-xl overflow-hidden shadow-2xl border border-cyan-900 z-50 transition-all duration-500">
