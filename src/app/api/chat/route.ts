@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     // Let's use the standard fetch to the model URL.
 
     const response = await fetch(
-      `https://api-inference.huggingface.co/models/${MODEL_ID}/v1/chat/completions`,
+      `https://router.huggingface.co/models/${MODEL_ID}/v1/chat/completions`,
       {
         headers: {
           Authorization: `Bearer ${apiKey}`,
