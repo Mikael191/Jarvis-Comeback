@@ -72,9 +72,18 @@ export async function POST(req: Request) {
     }
 
     const data = await response.json();
-    const reply = data.choices[0].message.content;
+    let reply = data.choices[0].message.content;
+    let music = null;
 
-    return NextResponse.json({ reply });
+    // Check for [MUSIC: ...] tag
+    const musicMatch = reply.match(/\[MUSIC:\s*(.*?)\]/i);
+    if (musicMatch) {
+        music = musicMatch[1].trim();
+        // Remove the tag from the spoken/displayed text
+        reply = reply.replace(musicMatch[0], "").trim();
+    }
+
+    return NextResponse.json({ reply, music });
 
   } catch (error) {
     console.error("Server Error:", error);

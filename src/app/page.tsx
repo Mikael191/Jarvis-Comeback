@@ -7,7 +7,6 @@ import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { SettingsModal } from "@/components/SettingsModal";
 import { MediaPlayer } from "@/components/MediaPlayer";
-import { detectMusicIntent } from "@/lib/musicIntent";
 
 export default function Home() {
   const { messages, apiKey, userName, voiceSpeed, addMessage } = useJarvisStore();
@@ -36,13 +35,7 @@ export default function Home() {
     };
     addMessage(userMsg);
 
-    // 2. Check for Music Intent
-    const musicIntent = detectMusicIntent(text);
-    if (musicIntent) {
-      setMusicQuery(musicIntent);
-    }
-
-    // 3. Call AI
+    // 2. Call AI
     setIsThinking(true);
     try {
       const response = await fetch('/api/chat', {
@@ -69,6 +62,11 @@ export default function Home() {
 
       addMessage(aiMsg);
       speak(data.reply, voiceSpeed);
+
+      // Update music if command received
+      if (data.music) {
+          setMusicQuery(data.music);
+      }
 
     } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
       const errorMsg = {

@@ -5,9 +5,9 @@ interface MediaPlayerProps {
 export function MediaPlayer({ query }: MediaPlayerProps) {
   if (!query) return null;
 
-  // Append "audio" to the query to find embeddable versions (avoids VEVO restrictions)
-  // And encode
-  const encodedQuery = encodeURIComponent(query + " audio");
+  // The query comes optimized from the AI (including "lyrics" or "audio")
+  // So we just encode it directly.
+  const encodedQuery = encodeURIComponent(query);
 
   // Get origin for CORS/Embed security
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
