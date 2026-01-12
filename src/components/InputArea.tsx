@@ -10,6 +10,7 @@ interface InputAreaProps {
   isListening: boolean;
   isLoading: boolean;
   disabled?: boolean;
+  className?: string;
 }
 
 export function InputArea({
@@ -17,7 +18,8 @@ export function InputArea({
   onToggleVoice,
   isListening,
   isLoading,
-  disabled
+  disabled,
+  className
 }: InputAreaProps) {
   const [input, setInput] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -44,7 +46,7 @@ export function InputArea({
   }, [input]);
 
   return (
-    <div className="p-4 bg-zinc-900/80 border-t border-zinc-800 backdrop-blur-md">
+    <div className={cn("p-4 bg-zinc-900/80 border-t border-zinc-800 backdrop-blur-md", className)}>
       <div className="max-w-3xl mx-auto flex items-end gap-2">
         <button
           onClick={onToggleVoice}

@@ -1,6 +1,8 @@
 import { X, Save, Key, User, Mic } from "lucide-react";
 import { useState } from "react";
 import { useJarvisStore } from "@/lib/store";
+import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
+import { VoiceSelector } from "./VoiceSelector";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -9,6 +11,7 @@ interface SettingsModalProps {
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
   const { apiKey, setApiKey, userName, setUserName, voiceSpeed, setVoiceSpeed } = useJarvisStore();
+  const { selectedVoice, setSelectedVoice } = useSpeechSynthesis();
 
   const [localKey, setLocalKey] = useState(apiKey || "");
   const [localName, setLocalName] = useState(userName || "");
@@ -79,6 +82,12 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
               className="w-full accent-cyan-500"
             />
           </div>
+
+          {/* Voice Selector */}
+          <VoiceSelector
+            selectedVoice={selectedVoice}
+            onVoiceChange={setSelectedVoice}
+          />
         </div>
 
         <button

@@ -60,31 +60,8 @@ export function JarvisInterface({
           </h1>
         </div>
 
-        {/* Mode Selector (Centered on Mobile, Left-aligned on Desktop) */}
-        <div className="flex items-center gap-1 bg-zinc-900/50 p-1 rounded-full border border-zinc-800 z-20 overflow-x-auto max-w-[200px] md:max-w-none no-scrollbar">
-          {(Object.keys(MODES) as JarvisMode[]).map((m) => {
-            const Icon = modeIcons[m];
-            const isActive = mode === m;
-            return (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                className={`p-2 rounded-full transition-all duration-300 relative group ${
-                  isActive ? "bg-cyan-900/30 text-cyan-400" : "text-zinc-500 hover:text-zinc-300"
-                }`}
-                title={MODES[m].label}
-              >
-                <Icon size={18} />
-                {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-cyan-400 rounded-full" />
-                )}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Center Visualizer (Desktop Only) */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-80 z-10 hidden lg:block">
+        {/* Visualizer (Now next to logo/settings to avoid overlap) */}
+        <div className="hidden lg:block opacity-80">
            <AudioVisualizer state={visualizerState} />
         </div>
 
@@ -109,13 +86,41 @@ export function JarvisInterface({
         <MessageList messages={messages} />
       </main>
 
-      {/* Input */}
-      <InputArea
-        onSendMessage={onSendMessage}
-        onToggleVoice={toggleVoice}
-        isListening={isListening}
-        isLoading={isThinking}
-      />
+      {/* Input Area + Mode Selector in Footer */}
+      <div className="bg-zinc-900/80 border-t border-zinc-800 backdrop-blur-md pb-safe">
+        {/* Mode Selector - Centered Above Input */}
+        <div className="flex justify-center pt-2">
+          <div className="flex items-center gap-1 bg-black/40 p-1 rounded-full border border-zinc-800/50">
+            {(Object.keys(MODES) as JarvisMode[]).map((m) => {
+              const Icon = modeIcons[m];
+              const isActive = mode === m;
+              return (
+                <button
+                  key={m}
+                  onClick={() => setMode(m)}
+                  className={`p-2 rounded-full transition-all duration-300 relative group ${
+                    isActive ? "bg-cyan-900/30 text-cyan-400" : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+                  title={MODES[m].label}
+                >
+                  <Icon size={16} />
+                  {isActive && (
+                    <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-cyan-400 rounded-full" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <InputArea
+          onSendMessage={onSendMessage}
+          onToggleVoice={toggleVoice}
+          isListening={isListening}
+          isLoading={isThinking}
+          className="border-t-0 bg-transparent"
+        />
+      </div>
     </div>
   );
 }
