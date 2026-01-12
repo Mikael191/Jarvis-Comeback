@@ -1,15 +1,14 @@
 import { NextResponse } from 'next/server';
-import { SYSTEM_PROMPT } from '@/lib/systemPrompt';
+import { buildSystemPrompt, JarvisMode } from '@/lib/jarvis-core';
+import { Insight } from '@/lib/store';
 
 // Using Groq API with the latest Llama 3.3 70B (Versatile)
-// This model is much smarter than 8B and still very fast on Groq.
-// Fallback: llama-3.1-8b-instant if 70B is unavailable (implemented in logic below)
 const PRIMARY_MODEL = "llama-3.3-70b-versatile";
 const FALLBACK_MODEL = "llama-3.1-8b-instant";
 
 export async function POST(req: Request) {
   try {
-    const { messages, apiKey } = await req.json();
+    const { messages, apiKey, userName, mode, insights } = await req.json();
 
     if (!apiKey) {
       return NextResponse.json(
@@ -17,6 +16,11 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
+
+    // Build Dynamic System Prompt based on Mode and Memory
+    const currentMode: JarvisMode = mode || 'rational';
+    const userInsights: Insight[] = insights || [];
+    const systemPrompt = buildSystemPrompt(userName || "Senhor", currentMode, userInsights);
 
     // Helper function to call Groq
     const callGroq = async (model: string) => {
@@ -31,7 +35,7 @@ export async function POST(req: Request) {
             body: JSON.stringify({
               model: model,
               messages: [
-                { role: "system", content: SYSTEM_PROMPT },
+                { role: "system", content: systemPrompt },
                 ...messages
               ],
               max_tokens: 1024,
@@ -48,8 +52,7 @@ export async function POST(req: Request) {
     // If 400/404/429, try Fallback Model (8B)
     if (!response.ok) {
         console.warn(`Primary model ${PRIMARY_MODEL} failed: ${response.status}. Trying fallback...`);
-        // We generally retry on errors, but especially 400 (Bad Request/Decommissioned) or 429 (Rate Limit)
-        if (response.status !== 401) { // Don't retry if key is invalid
+        if (response.status !== 401) {
             response = await callGroq(FALLBACK_MODEL);
         }
     }
@@ -74,16 +77,23 @@ export async function POST(req: Request) {
     const data = await response.json();
     let reply = data.choices[0].message.content;
     let music = null;
+    let memory = null;
 
     // Check for [MUSIC: ...] tag
     const musicMatch = reply.match(/\[MUSIC:\s*(.*?)\]/i);
     if (musicMatch) {
         music = musicMatch[1].trim();
-        // Remove the tag from the spoken/displayed text
         reply = reply.replace(musicMatch[0], "").trim();
     }
 
-    return NextResponse.json({ reply, music });
+    // Check for [MEMORY: ...] tag
+    const memoryMatch = reply.match(/\[MEMORY:\s*(.*?)\]/i);
+    if (memoryMatch) {
+        memory = memoryMatch[1].trim();
+        reply = reply.replace(memoryMatch[0], "").trim();
+    }
+
+    return NextResponse.json({ reply, music, memory });
 
   } catch (error) {
     console.error("Server Error:", error);

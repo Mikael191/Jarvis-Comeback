@@ -7,9 +7,11 @@ import { useSpeechRecognition } from "@/hooks/useSpeechRecognition";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { SettingsModal } from "@/components/SettingsModal";
 import { MusicSelector } from "@/components/MusicSelector";
+import { JarvisMode } from "@/lib/jarvis-core";
+import { toast, Toaster } from "sonner"; // Assuming sonner or similar usage, but let's implement a simple custom confirmation or use standard alert for now to save deps
 
 export default function Home() {
-  const { messages, apiKey, userName, voiceSpeed, addMessage } = useJarvisStore();
+  const { messages, apiKey, userName, voiceSpeed, addMessage, insights, addInsight } = useJarvisStore();
   const { isListening, transcript, startListening, stopListening, resetTranscript } = useSpeechRecognition();
   const { isSpeaking, speak, stopSpeaking } = useSpeechSynthesis();
 
@@ -17,8 +19,9 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false);
   const [musicQuery, setMusicQuery] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [mode, setMode] = useState<JarvisMode>('rational');
 
-  // Mark as hydrated after mount to avoid hydration mismatch and premature settings prompt
+  // Mark as hydrated after mount
   useEffect(() => {
     setIsHydrated(true);
   }, []);
@@ -35,7 +38,7 @@ export default function Home() {
     };
     addMessage(userMsg);
 
-    // 2. Call AI
+    // 2. Call AI with Enhanced Context
     setIsThinking(true);
     try {
       const response = await fetch('/api/chat', {
@@ -43,7 +46,10 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: messages.concat(userMsg).map(m => ({ role: m.role, content: m.content })),
-          apiKey
+          apiKey,
+          userName,
+          mode,
+          insights
         })
       });
 
@@ -68,7 +74,28 @@ export default function Home() {
           setMusicQuery(data.music);
       }
 
-    } catch (error: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+      // Handle Memory Insight
+      if (data.memory) {
+          setTimeout(() => {
+             toast.info("JARVIS identificou um padrão importante", {
+               description: `"${data.memory}"\nDeseja salvar na memória?`,
+               action: {
+                 label: "Salvar",
+                 onClick: () => {
+                   addInsight(data.memory);
+                   toast.success("Memória salva.");
+                 }
+               },
+               cancel: {
+                 label: "Ignorar",
+                 onClick: () => {}
+               },
+               duration: 10000,
+             });
+          }, 1000);
+      }
+
+    } catch (error: any) {
       const errorMsg = {
         id: (Date.now() + 1).toString(),
         role: 'assistant' as const,
@@ -80,7 +107,7 @@ export default function Home() {
     } finally {
       setIsThinking(false);
     }
-  }, [addMessage, messages, apiKey, userName, speak, voiceSpeed]);
+  }, [addMessage, messages, apiKey, userName, speak, voiceSpeed, mode, insights, addInsight]);
 
   // Auto-submit voice transcript when silence/end detected
   useEffect(() => {
@@ -90,30 +117,27 @@ export default function Home() {
     }
   }, [isListening, transcript, handleSendMessage, resetTranscript]);
 
-  // Prompt for API key on first load if missing
-  // Only check after hydration to ensure local storage has loaded
+  // Prompt for API key
   useEffect(() => {
     if (isHydrated && !apiKey) {
       setShowSettings(true);
-
-      // Check if init message exists to avoid duplicates in strict mode
       const hasInit = messages.some(m => m.id === 'init');
       if (messages.length === 0 && !hasInit) {
         addMessage({
           id: 'init',
           role: 'assistant',
-          content: `Olá. Eu sou o JARVIS. Para começarmos, por favor configure sua chave de acesso nas configurações.`,
+          content: `Olá, ${userName}. Estou pronto. Como posso ajudar hoje?`,
           timestamp: Date.now()
         });
       }
     }
-  }, [isHydrated, apiKey, messages, addMessage]);
+  }, [isHydrated, apiKey, messages, addMessage, userName]);
 
   const toggleVoice = () => {
     if (isListening) {
       stopListening();
     } else {
-      stopSpeaking(); // Stop talking if user interrupts
+      stopSpeaking();
       startListening();
     }
   };
@@ -129,6 +153,8 @@ export default function Home() {
         toggleVoice={toggleVoice}
         showSettings={() => setShowSettings(true)}
         currentTrack={musicQuery}
+        mode={mode}
+        setMode={setMode}
       />
 
       <MusicSelector
@@ -140,6 +166,7 @@ export default function Home() {
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
       />
+      <Toaster position="top-center" theme="dark" />
     </>
   );
 }

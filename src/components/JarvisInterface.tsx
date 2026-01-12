@@ -3,9 +3,9 @@
 import { MessageList, Message } from "@/components/MessageList";
 import { InputArea } from "@/components/InputArea";
 import { AudioVisualizer } from "@/components/AudioVisualizer";
-import { Settings, Music } from "lucide-react";
+import { Settings, Music, Brain, Heart, Sparkles, MessageCircle } from "lucide-react";
+import { JarvisMode, MODES } from "@/lib/jarvis-core";
 
-// Placeholder for full logic
 interface JarvisInterfaceProps {
   messages: Message[];
   onSendMessage: (text: string) => void;
@@ -15,6 +15,8 @@ interface JarvisInterfaceProps {
   toggleVoice: () => void;
   showSettings: () => void;
   currentTrack?: string | null;
+  mode: JarvisMode;
+  setMode: (mode: JarvisMode) => void;
 }
 
 export function JarvisInterface({
@@ -25,7 +27,9 @@ export function JarvisInterface({
   isSpeaking,
   toggleVoice,
   showSettings,
-  currentTrack
+  currentTrack,
+  mode,
+  setMode
 }: JarvisInterfaceProps) {
 
   const visualizerState = isListening
@@ -36,23 +40,55 @@ export function JarvisInterface({
         ? "speaking"
         : "idle";
 
+  const modeIcons = {
+    rational: Brain,
+    emotional: Heart,
+    reflective: Sparkles,
+    light: MessageCircle
+  };
+
+  const CurrentModeIcon = modeIcons[mode];
+
   return (
     <div className="flex flex-col h-[100dvh] max-h-[100dvh] bg-black/90 text-zinc-100 font-sans selection:bg-cyan-500/30">
       {/* Header */}
-      <header className="relative flex items-center justify-between px-6 py-4 border-b border-zinc-800 bg-black/50 backdrop-blur-sm z-10">
-        <div className="flex items-center gap-2 z-20">
+      <header className="relative flex items-center justify-between px-4 md:px-6 py-4 border-b border-zinc-800 bg-black/50 backdrop-blur-sm z-10 gap-2">
+        <div className="flex items-center gap-2 z-20 shrink-0">
           <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_10px_#06b6d4]" />
-          <h1 className="font-mono tracking-widest text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-700">
+          <h1 className="font-mono tracking-widest text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-700 hidden md:block">
             JARVIS
           </h1>
         </div>
 
-        {/* Center Visualizer */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-80 z-10">
+        {/* Mode Selector (Centered on Mobile, Left-aligned on Desktop) */}
+        <div className="flex items-center gap-1 bg-zinc-900/50 p-1 rounded-full border border-zinc-800 z-20 overflow-x-auto max-w-[200px] md:max-w-none no-scrollbar">
+          {(Object.keys(MODES) as JarvisMode[]).map((m) => {
+            const Icon = modeIcons[m];
+            const isActive = mode === m;
+            return (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className={`p-2 rounded-full transition-all duration-300 relative group ${
+                  isActive ? "bg-cyan-900/30 text-cyan-400" : "text-zinc-500 hover:text-zinc-300"
+                }`}
+                title={MODES[m].label}
+              >
+                <Icon size={18} />
+                {isActive && (
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-cyan-400 rounded-full" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Center Visualizer (Desktop Only) */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-80 z-10 hidden lg:block">
            <AudioVisualizer state={visualizerState} />
         </div>
 
-        <div className="flex items-center gap-4 z-20">
+        <div className="flex items-center gap-2 md:gap-4 z-20 shrink-0">
             {currentTrack && (
                 <div className="hidden md:flex items-center gap-2 text-xs text-cyan-400/70 border border-cyan-900/30 px-3 py-1 rounded-full">
                     <Music size={12} />
