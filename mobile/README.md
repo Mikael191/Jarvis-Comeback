@@ -12,8 +12,9 @@ Versão mobile do projeto JARVIS, construída com React Native (Expo).
 
 2.  **Inicie o projeto:**
     ```bash
-    npx expo start
+    npx expo start --clear
     ```
+    > **Nota para Windows:** Se encontrar erro de `node:sea`, delete a pasta `.expo` dentro de `mobile/` e tente novamente.
 
 3.  **Abra no seu celular:**
     *   Baixe o app **Expo Go** (Android/iOS).
